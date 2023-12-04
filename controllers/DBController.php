@@ -42,7 +42,3 @@ class DBController {
         }
     }
 }
-
-// Usage
-$result = DBController::query("SELECT * FROM some_table");
-DBController::close();

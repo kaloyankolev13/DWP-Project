@@ -1,11 +1,13 @@
+
 <?php
-include 'connection.php'; // Include the database connection
+require_once 'DBController.php';
 
 class Posts {
-    private $mysqli;
 
-    public function __construct($mysqli) {
-        $this->mysqli = $mysqli;
+    private $dbController;
+
+    public function __construct() {
+        $this->dbController = new DBController();
     }
 
     public function createPost($userId, $caption, $photo) {
@@ -28,114 +30,74 @@ class Posts {
         }
 
         // Begin transaction
-        $this->mysqli->begin_transaction();
+        DBController::query("START TRANSACTION");
 
         try {
             // Insert post data into 'posts' table
-            if ($stmt = $this->mysqli->prepare("INSERT INTO posts (user_id, caption) VALUES (?, ?)")) {
-                $stmt->bind_param("is", $userId, $caption);
-                $stmt->execute();
-                if ($stmt->affected_rows === 0) {
-                    throw new Exception('No rows affected. Unable to create post.');
-                }
-                $post_id = $stmt->insert_id;
-                $stmt->close();
-            } else {
-                throw new Exception("Error: " . $this->mysqli->error);
-            }
+            $post_id = DBController::query("INSERT INTO posts (user_id, caption) VALUES (?, ?)", [$userId, $caption]);
 
             // Insert photo data into 'photos' table
-            if ($stmt = $this->mysqli->prepare("INSERT INTO photos (post_id, photo_path) VALUES (?, ?)")) {
-                $stmt->bind_param("is", $post_id, $upload_path);
-                $stmt->execute();
-                if ($stmt->affected_rows === 0) {
-                    throw new Exception('No rows affected. Unable to upload photo.');
-                }
-                $stmt->close();
-            } else {
-                throw new Exception("Error: " . $this->mysqli->error);
-            }
+            DBController::query("INSERT INTO photos (post_id, photo_path) VALUES (?, ?)", [$post_id, $upload_path]);
 
             // Commit the transaction
-            $this->mysqli->commit();
+            DBController::query("COMMIT");
 
             return "Post created successfully with ID: " . $post_id;
         } catch (Exception $e) {
             // An error occurred, rollback the transaction
-            $this->mysqli->rollback();
+            DBController::query("ROLLBACK");
             throw $e;
         }
     }
+
     public function fetchPosts() {
-        $posts = []; // Initialize the array to hold the posts
-
-        $query = "SELECT p.post_id, p.caption, p.timestamp, u.username, ph.photo_path, 
-                    COUNT(l.like_id) as like_count
-                    FROM posts p
-                    LEFT JOIN users u ON p.user_id = u.user_id
-                    LEFT JOIN photos ph ON p.post_id = ph.post_id
-                    LEFT JOIN likes l ON p.post_id = l.post_id
-                    GROUP BY p.post_id
-                    ORDER BY p.timestamp DESC";
-
-        if ($result = $this->mysqli->query($query)) {
-            while ($row = $result->fetch_assoc()) {
-                // Sanitize data with htmlspecialchars or a similar method
-                $row['post_id'] = htmlspecialchars($row['post_id']);
-                $row['caption'] = htmlspecialchars($row['caption']);
-                $row['photo_path'] = htmlspecialchars($row['photo_path']) ?? 'path/to/default/image.jpg'; // Default image path if null
-                $row['timestamp'] = htmlspecialchars($row['timestamp']);
-                $row['username'] = htmlspecialchars($row['username']);
-                
-                // Append this row to the posts array
-                $posts[] = $row;
-            }
-            $result->free();
-        } else {
-            // Handle error - perhaps set an error message or log it
-        }
-
+        $posts = DBController::query("SELECT p.post_id, p.caption, p.timestamp, u.username, ph.photo_path, 
+                                      COUNT(l.like_id) as like_count
+                                      FROM posts p
+                                      LEFT JOIN users u ON p.user_id = u.user_id
+                                      LEFT JOIN photos ph ON p.post_id = ph.post_id
+                                      LEFT JOIN likes l ON p.post_id = l.post_id
+                                      GROUP BY p.post_id
+                                      ORDER BY p.timestamp DESC");
         return $posts;
     }
+
     public function fetchPostById($post_id) {
-        // Sanitize the input to prevent SQL injection
         $post_id = filter_var($post_id, FILTER_SANITIZE_NUMBER_INT);
 
-        // Prepare the SQL statement
-        $stmt = $this->mysqli->prepare("SELECT p.post_id, p.caption, p.timestamp, u.username, ph.photo_path, COUNT(l.like_id) as like_count
-                                        FROM posts p
-                                        LEFT JOIN users u ON p.user_id = u.user_id
-                                        LEFT JOIN photos ph ON p.post_id = ph.post_id
-                                        LEFT JOIN likes l ON p.post_id = l.post_id
-                                        WHERE p.post_id = ?
-                                        GROUP BY p.post_id");
+        $post = DBController::query("SELECT p.post_id, p.caption, p.timestamp, u.username, ph.photo_path, COUNT(l.like_id) as like_count
+                                     FROM posts p
+                                     LEFT JOIN users u ON p.user_id = u.user_id
+                                     LEFT JOIN photos ph ON p.post_id = ph.post_id
+                                     LEFT JOIN likes l ON p.post_id = l.post_id
+                                     WHERE p.post_id = ?
+                                     GROUP BY p.post_id", [$post_id]);
 
-        // Bind parameters and execute
-        $stmt->bind_param("i", $post_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $post = $result->fetch_assoc();
+        return $post ? $post[0] : false;
+    }
+    public function likePost($userId, $postId) {
+        // Check if the user has already liked the post
+        $checkLike = DBController::query("SELECT * FROM likes WHERE user_id = ? AND post_id = ?", [$userId, $postId]);
 
-        $stmt->close();
-
-        if (!$post) {
-            // Post not found, return false or handle the error as needed
-            return false;
+        if (count($checkLike) === 0) {
+            // User has not liked this post yet, insert like
+            DBController::query("INSERT INTO likes (post_id, user_id) VALUES (?, ?)", [$postId, $userId]);
+        } else {
+            // User has already liked this post
+            // Optionally, you can add code here to handle "unliking" the post
         }
-
-        return $post;
     }
 }
 
 // Usage
 try {
-    $posts = new Posts($mysqli);
     $user_id = (int)$_SESSION['user_id'];
 
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'], $_FILES['photo'])) {
         $caption = trim($_POST['caption']);
         $photo = $_FILES['photo'];
 
+        $posts = new Posts();
         echo $posts->createPost($user_id, $caption, $photo);
     }
 } catch (Exception $e) {

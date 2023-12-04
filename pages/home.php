@@ -1,11 +1,21 @@
-
 <?php
-include 'controllers/posts.php'; // Include the Posts class
-include 'connection.php'; // Include the database connection
+require_once 'controllers/Posts.php'; // Include the Posts class
+session_start();
+$postsObj = new Posts();
 
-$postsObj = new Posts($mysqli);
-$posts = $postsObj->fetchPosts();?>
+// Handle like action
+if (isset($_POST['like'], $_POST['post_id']) && isset($_SESSION['user_id'])) {
+    $post_id = $_POST['post_id'];
+    $user_id = $_SESSION['user_id'];
+    var_dump($post_id, $user_id);
+    $postsObj->likePost($user_id, $post_id);
 
+    // Optionally, add a redirect or other response handling here
+}
+
+// Fetch posts
+$posts = $postsObj->fetchPosts();
+?>
 <!-- Remove the header and paragraph if not needed -->
 <div class="container">
     <div class="row">
@@ -31,11 +41,10 @@ $posts = $postsObj->fetchPosts();?>
                     <div class="card-footer">
                         <!-- Like Count -->
                         <p class="card-text"><?= $post['like_count'] ?> likes</p>
-                        
                         <!-- Like Button -->
-                        <form action="like_post.php" method="post" class="d-inline">
+                        <form action="" method="post" class="d-inline">
                             <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
-                            <button type="submit" name="like" class="btn btn-primary">Like</button>
+                             <button type="submit" name="like" class="btn btn-primary">Like</button>
                         </form>
 
                         <!-- Comment Form -->

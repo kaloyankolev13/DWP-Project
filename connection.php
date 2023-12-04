@@ -16,21 +16,4 @@ if ($mysqli->connect_error) {
     die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
 }
 
-// $sqlFilePath = 'DB.sql';
-
-// // Check if file exists
-// if (file_exists($sqlFilePath)) {
-//     $sqlCommands = file_get_contents($sqlFilePath);
-    
-//     if ($mysqli->multi_query($sqlCommands)) {
-//         while ($mysqli->next_result()) {}  // Flush multi_queries
-//     } else {
-//         echo "Error executing SQL: " . $mysqli->error;
-//     }
-// } else {
-//     echo "SQL file not found: $sqlFilePath";
-// }
-
-// $mysqli->close();
-
 ?>

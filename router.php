@@ -107,7 +107,6 @@ function fetchPostById($postId) {
 
 function editPost($postId) {
     // Assuming the user must be logged in to edit a post
-    session_start(); // Make sure session_start() is called at the beginning if not already called
     if (!isset($_SESSION['user_id'])) {
         header('Location: login.php');
         exit;
