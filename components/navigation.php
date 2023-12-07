@@ -6,6 +6,7 @@ $menuItems = [
     ['url' => '/login', 'label' => 'Login'],
     ['url' => '/profile', 'label' => 'Profile'],
     ['url' => '/about', 'label' => 'About'],
+    ['url' => '/create-post', 'label' => 'Post'],
 ];
 
 function url($path) {
@@ -28,7 +29,6 @@ function url($path) {
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo url('/about'); ?>">About</a>
                 </li>
-                
                 <!-- Conditional menu items -->
                 <?php if (!isset($_SESSION['user_id'])): ?>
                     <li class="nav-item">

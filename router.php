@@ -8,6 +8,7 @@ function route($uri) {
         case '/register':
             register();
             break;
+
         case '/post-detail':
                 // Use $_GET superglobal to get post_id directly
             $postId = isset($_GET['post_id']) ? $_GET['post_id'] : null;
@@ -17,6 +18,7 @@ function route($uri) {
                 notFound();
             }
             break;
+
         case '/edit_post':
             $postId = isset($_GET['post_id']) ? $_GET['post_id'] : null;
             if ($postId) {
@@ -25,9 +27,11 @@ function route($uri) {
                 notFound();
             }
             break;
+
         case '/login':
             login();
             break;
+
         case '/profile':
             if (!isLoggedIn()) {
                 login(); // Redirect to login page
@@ -35,10 +39,19 @@ function route($uri) {
                 profile();
             }
             break;
+
         case '/about':
             about();
             break;
-    
+
+        case '/create-post':
+            if (!isLoggedIn()) {
+                login(); // Redirect to login page
+            } else {
+                create_post();
+            }
+            break;
+
         default:
             notFound();
             break;
@@ -53,6 +66,10 @@ function render($page, $variables = []) {
 
 function home() {
     render('home');
+}
+
+function create_post() {
+    render('create_post');
 }
 
 function about() {

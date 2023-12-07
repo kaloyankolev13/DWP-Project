@@ -14,40 +14,39 @@ class Posts {
         if (empty($caption)) {
             throw new Exception("Please enter a caption for the post.");
         }
-
         $upload_directory = 'uploads/'; // Ensure this directory exists and is writable
         $upload_path = $upload_directory . basename($photo['name']);
-
         // Check if the file is an actual image
         $check = getimagesize($photo["tmp_name"]);
         if ($check === false) {
             throw new Exception("File is not an image.");
         }
-
         // Attempt to upload the file
         if (!move_uploaded_file($photo['tmp_name'], $upload_path)) {
             throw new Exception("There was an error uploading your file.");
         }
-
         // Begin transaction
-        DBController::query("START TRANSACTION");
+        $this->dbController->beginTransaction();
+    try {
+        // Insert post data into 'posts' table and get the last inserted ID
+        $post_id = $this->dbController->query("INSERT INTO posts (user_id, caption) VALUES (?, ?)", [$userId, $caption]);
 
-        try {
-            // Insert post data into 'posts' table
-            $post_id = DBController::query("INSERT INTO posts (user_id, caption) VALUES (?, ?)", [$userId, $caption]);
-
-            // Insert photo data into 'photos' table
-            DBController::query("INSERT INTO photos (post_id, photo_path) VALUES (?, ?)", [$post_id, $upload_path]);
-
-            // Commit the transaction
-            DBController::query("COMMIT");
-
-            return "Post created successfully with ID: " . $post_id;
-        } catch (Exception $e) {
-            // An error occurred, rollback the transaction
-            DBController::query("ROLLBACK");
-            throw $e;
+        // Check if $post_id is received correctly
+        if ($post_id <= 0) {
+            throw new Exception("Failed to retrieve post ID after insertion.");
         }
+
+        // Insert photo data into 'photos' table with the correct post_id
+        $this->dbController->query("INSERT INTO photos (post_id, photo_path) VALUES (?, ?)", [$post_id, $upload_path]);
+
+        // Commit the transaction
+        $this->dbController->commit();
+        return "Post created successfully with ID: " . $post_id;
+    } catch (Exception $e) {
+        // An error occurred, rollback the transaction
+        $this->dbController->rollback();
+        throw $e;
+    }
     }
 
     public function fetchPosts() {
@@ -77,14 +76,23 @@ class Posts {
     }
     public function likePost($userId, $postId) {
         // Check if the user has already liked the post
-        $checkLike = DBController::query("SELECT * FROM likes WHERE user_id = ? AND post_id = ?", [$userId, $postId]);
-
-        if (count($checkLike) === 0) {
-            // User has not liked this post yet, insert like
-            DBController::query("INSERT INTO likes (post_id, user_id) VALUES (?, ?)", [$postId, $userId]);
-        } else {
-            // User has already liked this post
-            // Optionally, you can add code here to handle "unliking" the post
+        $this->dbController->beginTransaction();
+        try {
+            // Check if the user has already liked the post
+            $checkLike = $this->dbController->query("SELECT * FROM likes WHERE user_id = ? AND post_id = ?", [$userId, $postId]);
+            if (count($checkLike) === 0) {
+                // User has not liked this post yet, insert like
+                $this->dbController->query("INSERT INTO likes (post_id, user_id) VALUES (?, ?)", [$postId, $userId]);
+            } else {
+                // User has already liked this post, delete the like
+                $this->dbController->query("DELETE FROM likes WHERE user_id = ? AND post_id = ?", [$userId, $postId]);
+            }
+            // Commit the transaction
+            $this->dbController->commit();
+        } catch (Exception $e) {
+            // An error occurred, rollback the transaction
+            $this->dbController->rollback();
+            throw $e;
         }
     }
 }

@@ -1,0 +1,90 @@
+<?php
+require_once 'DBController.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
+class User {
+        private $dbController;
+        public function __construct() {
+            $this->dbController = new DBController();
+        }
+        public function register($username, $email, $password) {
+            if (empty($username)) {
+                throw new Exception("Please enter a username.");
+            }
+            if (empty($email)) {
+                throw new Exception("Please enter an email address.");
+            }
+            if (empty($password)) {
+                throw new Exception("Please enter a password.");
+            }
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT); // Hash the password
+            // Begin transaction
+            $this->dbController->beginTransaction();
+            try {
+                // Insert user data into 'users' table and get the last inserted ID
+                $user_id = $this->dbController->query("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [$username, $email, $hashedPassword]);
+                // Check if $user_id is received correctly
+                if ($user_id <= 0) {
+                    throw new Exception("Failed to retrieve user ID after insertion.");
+                }
+                // Commit the transaction
+                $this->dbController->commit();
+                return "User created successfully with ID: " . $user_id;
+            } catch (Exception $e) {
+                // An error occurred, rollback the transaction
+                $this->dbController->rollback();
+                throw $e;
+            }
+        }
+        public function login($email, $password) {
+            if (empty($email)) {
+                throw new Exception("Please enter an email address.");
+            }
+            if (empty($password)) {
+                throw new Exception("Please enter a password.");
+            }
+            $result = $this->dbController->query("SELECT user_id, password FROM users WHERE email = ?", [$email]);
+            $user = $result[0] ?? null;
+            if ($user) {
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['loggedin'] = true;
+                    $_SESSION['user_id'] = $user['user_id'];
+                    return "Logged in successfully!";
+                } else {
+                    throw new Exception("Incorrect password!");
+                }
+            } else {
+                throw new Exception("User not found!");
+            }
+        }
+
+        public function logout() {
+            session_destroy();
+            header('Location: /DWP_assignment/login');
+        }
+        public function isLoggedIn() {
+            return isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
+}
+
+
+}
+
+try {
+    session_start();
+    $userObj = new User();
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
+        $username = $_POST['username'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        echo $userObj->register($username, $email, $password);
+        // Redirect or refresh the page as needed after registration
+    }
+} catch (Exception $e) {
+    echo $e->getMessage();
+}
+?>

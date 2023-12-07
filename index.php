@@ -1,5 +1,5 @@
 <?php
-include 'session.php';
+// include 'session.php';
 include 'router.php';
 
 // Get the current request URI

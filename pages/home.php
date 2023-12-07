@@ -1,15 +1,22 @@
 <?php
 require_once 'controllers/Posts.php'; // Include the Posts class
-session_start();
 $postsObj = new Posts();
+
+// Handle post creation
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create_post'])) {
+    $userId = $_SESSION['user_id']; // Assuming you store user id in session upon login
+    $caption = $_POST['caption'];
+    $photo = $_FILES['photo']; // Assuming the name of your file input is 'photo'
+
+    $createResult = $postsObj->createPost($userId, $caption, $photo);
+    // Optionally, add a redirect or other response handling here
+}
 
 // Handle like action
 if (isset($_POST['like'], $_POST['post_id']) && isset($_SESSION['user_id'])) {
     $post_id = $_POST['post_id'];
     $user_id = $_SESSION['user_id'];
-    var_dump($post_id, $user_id);
     $postsObj->likePost($user_id, $post_id);
-
     // Optionally, add a redirect or other response handling here
 }
 
@@ -19,6 +26,11 @@ $posts = $postsObj->fetchPosts();
 <!-- Remove the header and paragraph if not needed -->
 <div class="container">
     <div class="row">
+    <form action="" method="post" enctype="multipart/form-data">
+    <input type="text" name="caption" placeholder="Enter caption" required>
+    <input type="file" name="photo" required>
+    <button type="submit" name="create_post">Create Post</button>
+</form>
         <?php foreach ($posts as $post): ?>
             <div class="col-12 mb-3">
                 <div class="card">
@@ -26,6 +38,7 @@ $posts = $postsObj->fetchPosts();
                     <a href="/DWP_assignment/post-detail?post_id=<?= $post['post_id']; ?>">
                         <img src="<?= $post['photo_path'] ?>" class="card-img-top" alt="Post image">
                     </a>
+                    <h1><?php var_dump($post) ?></h1>
 
                     <!-- Card Body -->
                     <div class="card-body">

@@ -21,16 +21,33 @@ class DBController {
         return self::$connection;
     }
 
+    public static function beginTransaction() {
+        self::connect()->begin_transaction();
+    }
+
+    public static function commit() {
+        self::connect()->commit();
+    }
+
+    public static function rollback() {
+        self::connect()->rollback();
+    }
+
+
     public static function query($query, $params = []) {
         $stmt = self::connect()->prepare($query);
         if ($params) {
-            $types = str_repeat("s", count($params)); // Assuming all parameters are strings
+            $types = str_repeat("s", count($params));
             $stmt->bind_param($types, ...$params);
         }
-        $stmt->execute();
-        if (explode(' ', $query)[0] == 'SELECT') {
+        if (!$stmt->execute()) {
+            throw new Exception("Error executing query: " . $stmt->error);
+        }
+        if (strpos($query, 'SELECT') === 0) {
             $result = $stmt->get_result();
             return $result->fetch_all(MYSQLI_ASSOC);
+        } elseif (strpos($query, 'INSERT') === 0) {
+            return $stmt->insert_id; // This returns the last inserted ID
         } else {
             return $stmt->affected_rows;
         }
