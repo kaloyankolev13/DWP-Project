@@ -1,5 +1,10 @@
 <?php
-function route($uri) {
+require_once 'controllers/User.php'; 
+
+    $userObj = new User(); // Instantiate the User object
+
+
+function route($uri, $userObj) {
     $path = parse_url($uri, PHP_URL_PATH);
     switch ($path) {
         case '':
@@ -33,23 +38,15 @@ function route($uri) {
             break;
 
         case '/profile':
-            if (!isLoggedIn()) {
-                login(); // Redirect to login page
-            } else {
-                profile();
+            if (!$userObj->isLoggedIn()) {
+                login();
+                exit;
             }
+            profile();
             break;
 
         case '/about':
             about();
-            break;
-
-        case '/create-post':
-            if (!isLoggedIn()) {
-                login(); // Redirect to login page
-            } else {
-                create_post();
-            }
             break;
 
         default:

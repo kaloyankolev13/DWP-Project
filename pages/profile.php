@@ -1,74 +1,37 @@
 <?php
-include 'connection.php'; // Your database connection file
+require_once 'controllers/UserProfile.php'; // Adjust the path as necessary
 
-// Check if the user is logged in, assuming you've set $_SESSION['user_id'] when they logged in
+$userProfile = new UserProfile();
+
 if (!isset($_SESSION['user_id'])) {
-    // Redirect to login page if the user is not logged in
     header('Location: login.php');
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
-
-// Fetch user data from the database
-$query = "SELECT username, email, registration_date FROM users WHERE user_id = ?";
-$stmt = $mysqli->prepare($query);
-
-// Check if the prepare was successful
-if ($stmt === false) {
-    die("Prepare failed: " . $mysqli->error);
-}
-
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Fetch the user data
-if ($user = $result->fetch_assoc()) {
-    // Sanitize the output
-    foreach ($user as $key => $value) {
-        $user[$key] = htmlspecialchars($value);
-    }
-} else {
-    // Handle the case where the user doesn't exist in the database
+$user = $userProfile->getUserDetails($user_id);
+if (!$user) {
     die("User not found.");
 }
 
-$stmt->close();
+$posts = $userProfile->getUserPosts($user_id);
 
-$postQuery = "SELECT p.post_id, p.caption, p.timestamp, ph.photo_path 
-              FROM posts p
-              LEFT JOIN photos ph ON p.post_id = ph.post_id
-              WHERE p.user_id = ? 
-              ORDER BY p.timestamp DESC";
-$postStmt = $mysqli->prepare($postQuery);
-
-if ($postStmt === false) {
-    die("Prepare failed: " . $mysqli->error);
+// Sanitize the user data
+foreach ($user as $key => $value) {
+    $user[$key] = htmlspecialchars($value);
 }
 
-$postStmt->bind_param("i", $user_id);
-$postStmt->execute();
-$postsResult = $postStmt->get_result();
-
-$posts = [];
-while ($postRow = $postsResult->fetch_assoc()) {
-    $posts[] = [
-        'post_id' => htmlspecialchars($postRow['post_id']),
-        'caption' => htmlspecialchars($postRow['caption']),
-        'timestamp' => htmlspecialchars($postRow['timestamp']),
-        'photo_path' => htmlspecialchars($postRow['photo_path']),
-    ];
+// Sanitize the posts data
+foreach ($posts as $index => $post) {
+    foreach ($post as $key => $value) {
+        $posts[$index][$key] = htmlspecialchars($value);
+    }
 }
-
-$postStmt->close();
-$mysqli->close();
 ?>
 
 
 
 <div class="container my-4">
-    
     <div class="row">
         <!-- Profile Sidebar -->
         <div class="col-md-4">
@@ -128,7 +91,3 @@ $mysqli->close();
     </div>
 </div>
 
-
-<!-- Bootstrap Bundle with Popper -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-</body>

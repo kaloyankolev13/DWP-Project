@@ -38,7 +38,6 @@ $posts = $postsObj->fetchPosts();
                     <a href="/DWP_assignment/post-detail?post_id=<?= $post['post_id']; ?>">
                         <img src="<?= $post['photo_path'] ?>" class="card-img-top" alt="Post image">
                     </a>
-                    <h1><?php var_dump($post) ?></h1>
 
                     <!-- Card Body -->
                     <div class="card-body">

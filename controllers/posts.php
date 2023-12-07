@@ -1,7 +1,6 @@
 
 <?php
 require_once 'DBController.php';
-
 class Posts {
 
     private $dbController;
