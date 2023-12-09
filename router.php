@@ -6,6 +6,7 @@ require_once 'controllers/User.php';
 
 function route($uri, $userObj) {
     $path = parse_url($uri, PHP_URL_PATH);
+    
     switch ($path) {
         case '':
             home();
