@@ -41,10 +41,8 @@ function url($path) {
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo url('/profile'); ?>">Profile</a>
                     </li>
-                    <!-- Add a logout process link or form here -->
                 <?php endif; ?>
             </ul>
-            <!-- Search form removed -->
         </div>
     </div>
 </nav>

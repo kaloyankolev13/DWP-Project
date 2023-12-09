@@ -21,20 +21,15 @@ class User {
                 throw new Exception("Please enter a password.");
             }
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT); // Hash the password
-            // Begin transaction
             $this->dbController->beginTransaction();
             try {
-                // Insert user data into 'users' table and get the last inserted ID
                 $user_id = $this->dbController->query("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [$username, $email, $hashedPassword]);
-                // Check if $user_id is received correctly
                 if ($user_id <= 0) {
                     throw new Exception("Failed to retrieve user ID after insertion.");
                 }
-                // Commit the transaction
                 $this->dbController->commit();
                 return "User created successfully with ID: " . $user_id;
             } catch (Exception $e) {
-                // An error occurred, rollback the transaction
                 $this->dbController->rollback();
                 throw $e;
             }
@@ -82,7 +77,6 @@ try {
         $password = $_POST['password'];
 
         echo $userObj->register($username, $email, $password);
-        // Redirect or refresh the page as needed after registration
     }
 } catch (Exception $e) {
     echo $e->getMessage();

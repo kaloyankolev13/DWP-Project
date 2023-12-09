@@ -32,7 +32,6 @@ if (!$post) {
             <label for="caption" class="form-label">Caption</label>
             <textarea class="form-control" id="caption" name="caption"><?= htmlspecialchars($post['caption']); ?></textarea>
         </div>
-        <!-- Include other fields if necessary -->
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
 </div>

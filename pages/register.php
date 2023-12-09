@@ -14,8 +14,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
     try {
         $userObj = new User();
         $registrationResult = $userObj->register($username, $email, $password);
-        // Optionally, redirect to a login page or show a success message
-        // header("Location: login.php");
         echo "<p>$registrationResult</p>";
     } catch (Exception $e) {
         $errorMessage = $e->getMessage();

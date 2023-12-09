@@ -13,8 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     try {
         $userObj = new User();
         $loginResult = $userObj->login($email, $password);
-        // Optionally, redirect to a different page or show a success message
-        // header("Location: welcome.php");
         echo "<p>$loginResult</p>";
     } catch (Exception $e) {
         $errorMessage = $e->getMessage();

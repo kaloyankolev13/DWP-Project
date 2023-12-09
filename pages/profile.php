@@ -33,26 +33,21 @@ foreach ($posts as $index => $post) {
 
 <div class="container my-4">
     <div class="row">
-        <!-- Profile Sidebar -->
         <div class="col-md-4">
             <div class="card">
-                <!-- Replace with the actual path to the user's profile picture or a placeholder if not available -->
                 <img src="https://via.placeholder.com/150" class="card-img-top" alt="Profile Image">
                 <div class="card-body">
                     <h4 class="card-title"><?= $user['username'] ?></h4>
-                    <!-- You can add more user details here if needed -->
                     <p class="card-text">Member since <?= date("F j, Y", strtotime($user['registration_date'])) ?></p>
                     <a href="#" class="btn btn-primary">Edit Profile</a>
                 </div>
             </div>
         </div>
 
-        <!-- Profile Details -->
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Profile Details</h5>
-                    <!-- The form action should point to a script that processes the form data -->
                     <form action="process_profile_update.php" method="post">
                         <div class="mb-3">
                             <label for="userName" class="form-label">Username</label>
@@ -62,7 +57,6 @@ foreach ($posts as $index => $post) {
                             <label for="userEmail" class="form-label">Email address</label>
                             <input type="email" class="form-control" id="userEmail" value="<?= $user['email'] ?>">
                         </div>
-                        <!-- Include additional fields as necessary -->
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
                 </div>
@@ -75,14 +69,12 @@ foreach ($posts as $index => $post) {
     <div class="row">
         <?php foreach ($posts as $post): ?>
             <div class="col-md-6 col-lg-4 mb-3">
-                <!-- The entire card is clickable and links to the edit post page -->
                 <a href="/DWP_assignment/edit_post?post_id=<?= $post['post_id'] ?>" class="card-link">
                     <div class="card">
                         <img src="<?= $post['photo_path'] ?: 'https://via.placeholder.com/150' ?>" class="card-img-top" alt="Post Image">
                         <div class="card-body">
                             <h5 class="card-title"><?= $post['caption'] ?></h5>
                             <p class="card-text"><small class="text-muted">Posted on <?= date("F j, Y, g:i a", strtotime($post['timestamp'])) ?></small></p>
-                            <!-- Add an edit button or icon here if preferred -->
                         </div>
                     </div>
                 </a>
