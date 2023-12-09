@@ -6,7 +6,8 @@ require_once 'controllers/User.php';
 
 function route($uri, $userObj) {
     $path = parse_url($uri, PHP_URL_PATH);
-    
+    var_dump($uri);
+
     switch ($path) {
         case '':
             home();
@@ -16,7 +17,6 @@ function route($uri, $userObj) {
             break;
 
         case '/post-detail':
-                // Use $_GET superglobal to get post_id directly
             $postId = isset($_GET['post_id']) ? $_GET['post_id'] : null;
             if ($postId) {
                 singlePost($postId);
