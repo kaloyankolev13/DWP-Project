@@ -1,9 +1,6 @@
 RewriteEngine On
 RewriteBase /DWP_assignment/
-RewriteCond %{HTTPS} !=on
-RewriteCond %{HTTP:X-Forwarded-Proto} !https
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteRule ^index\\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-
-RewriteRule ^(.+)$ index.php [QSA,L]
+RewriteRule . /DWP_assignment/index.php [L]
