@@ -1,5 +1,9 @@
 <?php
 require_once 'controllers/User.php'; 
+require_once 'controllers/User.php'; // Adjust the path as necessary
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
     $userObj = new User(); // Instantiate the User object
 
