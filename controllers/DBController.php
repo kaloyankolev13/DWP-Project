@@ -4,13 +4,46 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 class DBController {
-    private static $host = 'localhost';
-    private static $db = 'user_accounts';
-    private static $user = 'root'; //TODO: change this
-    private static $pass = '';
+    private static $host;
+    private static $db;
+    private static $user;
+    private static $pass;
     private static $connection;
 
+    // Method to load environment variables from .env file
+    private static function loadEnvironmentVariables($envFilePath) {
+        if (!file_exists($envFilePath)) {
+            return;
+        }
+
+        $lines = file($envFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos(trim($line), '#') === 0) {
+                continue; // Skip comments
+            }
+
+            list($name, $value) = explode('=', $line, 2);
+            $name = trim($name);
+            $value = trim($value);
+
+            if (!array_key_exists($name, $_SERVER) && !array_key_exists($name, $_ENV)) {
+                putenv(sprintf('%s=%s', $name, $value));
+                $_ENV[$name] = $value;
+                $_SERVER[$name] = $value;
+            }
+        }
+    }
+
     private static function connect() {
+        // Load environment variables
+        self::loadEnvironmentVariables(__DIR__ . '/../.env');
+
+        // Initialize variables from environment
+        self::$host = getenv('DB_HOST') ?: self::$host;
+        self::$db = getenv('DB_DATABASE') ?: self::$db;
+        self::$user = getenv('DB_USERNAME') ?: self::$user;
+        self::$pass = getenv('DB_PASSWORD') ?: self::$pass;
+
         if (!isset(self::$connection)) {
             self::$connection = new mysqli(self::$host, self::$user, self::$pass, self::$db);
             if (self::$connection->connect_error) {
@@ -20,6 +53,7 @@ class DBController {
         }
         return self::$connection;
     }
+
 
     public static function beginTransaction() {
         self::connect()->begin_transaction();
