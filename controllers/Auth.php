@@ -3,9 +3,10 @@ require_once 'DBController.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+session_start();
 
 
-class User {
+class Auth {
         private $dbController;
         public function __construct() {
             $this->dbController = new DBController();
@@ -67,18 +68,5 @@ class User {
 
 }
 
-try {
-    session_start();
-    $userObj = new User();
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
-        $username = $_POST['username'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        echo $userObj->register($username, $email, $password);
-    }
-} catch (Exception $e) {
-    echo $e->getMessage();
-}
 ?>

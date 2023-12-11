@@ -26,6 +26,13 @@ class Comments {
         return "Comment added successfully.";
     }
 
-
+    public function deleteComment($commentId, $userId) {
+        $comment = $this->dbController->query("SELECT * FROM comments WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
+        if (count($comment) === 0) {
+            throw new Exception("You are not authorized to delete this comment.");
+        }
+        $this->dbController->query("DELETE FROM comments WHERE comment_id = ?", [$commentId]);
+        return "Comment deleted successfully.";
+    }
 }
 ?>

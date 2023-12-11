@@ -13,7 +13,7 @@ class Posts {
         if (empty($caption)) {
             throw new Exception("Please enter a caption for the post.");
         }
-        $upload_directory = 'uploads/'; 
+        $upload_directory = 'uploads/';
         $upload_path = $upload_directory . basename($photo['name']);
         $check = getimagesize($photo["tmp_name"]);
         if ($check === false) {
@@ -85,18 +85,4 @@ class Posts {
     }
 }
 
-// Usage
-try {
-    $user_id = (int)$_SESSION['user_id'];
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'], $_FILES['photo'])) {
-        $caption = trim($_POST['caption']);
-        $photo = $_FILES['photo'];
-
-        $posts = new Posts();
-        echo $posts->createPost($user_id, $caption, $photo);
-    }
-} catch (Exception $e) {
-    die($e->getMessage());
-}
 ?>

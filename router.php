@@ -1,16 +1,16 @@
 <?php
-require_once 'controllers/User.php'; 
-require_once 'controllers/User.php'; // Adjust the path as necessary
+require_once 'controllers/Auth.php'; 
+require_once 'controllers/UserProfile.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-    $userObj = new User(); // Instantiate the User object
+    $authObj = new Auth(); // Instantiate the User object
+    $userProfileObj = new UserProfile(); // Instantiate the UserProfile object
 
 
-function route($uri, $userObj) {
+function route($uri, $authObj) {
     $path = parse_url($uri, PHP_URL_PATH);
-    var_dump($uri);
 
     switch ($path) {
         case '':
@@ -43,11 +43,13 @@ function route($uri, $userObj) {
             break;
 
         case '/profile':
-            if (!$userObj->isLoggedIn()) {
+            if (!$authObj->isLoggedIn()) {
                 login();
-                exit;
+                    exit;
             }
-            profile();
+            $userProfile = new UserProfile();
+            $userId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
+            profile($userId, $userProfile);
             break;
 
         case '/about':
@@ -79,9 +81,23 @@ function about() {
     render('about', ['message' => $welcomeMessage]);
 }
 
-function profile() {
-    render('profile');
+function profile($userId, $userProfile) {
+    if (!$userId) {
+        // Redirect to login or handle the case where there is no user ID
+        login();
+        exit;
+    }
+
+    $userDetails = $userProfile->getUserDetails($userId);
+    $userPosts = $userProfile->getUserPosts($userId);
+
+    if ($userDetails) {
+        render('profile', ['user' => $userDetails, 'posts' => $userPosts]);
+    } else {
+        notFound();
+    }
 }
+
 
 function register() {
     render('register');

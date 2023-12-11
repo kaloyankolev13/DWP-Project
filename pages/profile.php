@@ -1,31 +1,29 @@
 <?php
-require_once 'controllers/UserProfile.php'; // Adjust the path as necessary
+require_once 'controllers/UserProfile.php';
+
 
 $userProfile = new UserProfile();
 
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
-}
+if (isset($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
 
-$user_id = $_SESSION['user_id'];
-$user = $userProfile->getUserDetails($user_id);
-if (!$user) {
-    die("User not found.");
-}
-
-$posts = $userProfile->getUserPosts($user_id);
-
-// Sanitize the user data
-foreach ($user as $key => $value) {
-    $user[$key] = htmlspecialchars($value);
-}
-
-// Sanitize the posts data
-foreach ($posts as $index => $post) {
-    foreach ($post as $key => $value) {
-        $posts[$index][$key] = htmlspecialchars($value);
+    $user = $userProfile->getUserDetails($user_id);
+    if (!$user) {
+        die("User not found."); // Or redirect to a different page
     }
+
+    $posts = $userProfile->getUserPosts($user_id);
+
+    // Sanitize the user data and posts data
+    $user = array_map('htmlspecialchars', $user);
+    $posts = array_map(function($post) {
+        return array_map('htmlspecialchars', $post);
+    }, $posts);
+
+} else {
+    // Redirect or show an error message if user_id is not provided in the URL
+    header('Location: default_page.php'); // Redirect to a default page
+    exit;
 }
 ?>
 

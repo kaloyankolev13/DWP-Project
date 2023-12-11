@@ -1,5 +1,5 @@
 <?php
-require_once 'controllers/Posts.php'; // Include the Posts class
+require_once 'controllers/Posts.php';
 require_once 'controllers/Comments.php';
 
 $postsObj = new Posts();
@@ -8,7 +8,7 @@ $commentsObj = new Comments();
 
 // Comments creation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_comment'], $_POST['comment'], $_POST['post_id'])) {
-    $userId = $_SESSION['user_id']; // Assuming you store user id in session upon login
+    $userId = $_SESSION['user_id'];
     $comment = $_POST['comment'];
     $postId = $_POST['post_id'];
 
@@ -17,12 +17,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_comment'], $_PO
 
 // Post creation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create_post'])) {
-    $userId = $_SESSION['user_id']; // Assuming you store user id in session upon login
+    $userId = $_SESSION['user_id'];
     $caption = $_POST['caption'];
-    $photo = $_FILES['photo']; // Assuming the name of your file input is 'photo'
+    $photo = $_FILES['photo'];
 
     $createResult = $postsObj->createPost($userId, $caption, $photo);
-    // Optionally, add a redirect or other response handling here
 }
 
 // Like action
@@ -30,10 +29,8 @@ if (isset($_POST['like'], $_POST['post_id']) && isset($_SESSION['user_id'])) {
     $post_id = $_POST['post_id'];
     $user_id = $_SESSION['user_id'];
     $postsObj->likePost($user_id, $post_id);
-    // Optionally, add a redirect or other response handling here
 }
 
-// Fetch posts
 $posts = $postsObj->fetchPosts();
 ?>
 <div class="container">
@@ -44,7 +41,6 @@ $posts = $postsObj->fetchPosts();
             <button type="submit" name="create_post">Create Post</button>
         </form>
         <?php foreach ($posts as $post) : ?>
-            <?php var_dump($post); ?>
             <div class="col-12 mb-3">
                 <div class="card">
                     <a href="/DWP_assignment/post-detail?post_id=<?= $post['post_id']; ?>">
@@ -55,7 +51,9 @@ $posts = $postsObj->fetchPosts();
                         <h5 class="card-title">
                             <a href="/DWP_assignment/post-detail?post_id=<?= $post['post_id']; ?>"><?= $post['caption'] ?></a>
                             <br>
-                            <a href="profile?user_id=<?= $post['user_id']; ?>"><?= $post['username'] ?></a>
+                            <a href="/DWP_assignment/profile?user_id=<?= $post['user_id']; ?>">
+                                <?= $post['username']; ?>
+                            </a>
 
                         </h5>
                         <p class="card-text"><small class="text-muted">Last updated <?= date("F j, Y, g:i a", strtotime($post['timestamp'])) ?></small></p>

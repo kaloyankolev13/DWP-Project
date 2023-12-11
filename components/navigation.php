@@ -1,5 +1,5 @@
 <?php
-require_once 'controllers/User.php'; // Adjust the path as necessary
+require_once 'controllers/Auth.php'; // Adjust the path as necessary
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -39,7 +39,10 @@ $menuItems = [
                     </li>
                 <?php else: ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="profile">Profile</a>
+                        <a class="nav-link" href="profile?user_id=<?php echo $_SESSION['user_id']; ?>">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout">Logout</a>
                     </li>
                 <?php endif; ?>
             </ul>

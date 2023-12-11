@@ -1,8 +1,12 @@
 <?php
-require_once 'controllers/User.php'; // Adjust the path as necessary
+require_once 'controllers/Auth.php'; // Adjust the path as necessary
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+$username = $_SESSION['user_id'];
+$email = $_SESSION['email'];
+var_dump($username);
+
 
 $errorMessage = '';
 
@@ -11,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $password = $_POST['password'];
 
     try {
-        $userObj = new User();
+        $userObj = new Auth();
         $loginResult = $userObj->login($email, $password);
         echo "<p>$loginResult</p>";
     } catch (Exception $e) {
