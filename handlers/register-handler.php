@@ -1,6 +1,6 @@
 <?php
 require_once '../controllers/DBController.php';
-require_once '../controllers/Auth.php'; // Assuming you have your User class in 'User.php'
+require_once '../controllers/Auth.php'; 
 
 try {
     session_start();

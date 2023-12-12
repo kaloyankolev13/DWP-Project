@@ -1,12 +1,12 @@
 <?php
 require_once 'controllers/Auth.php'; 
-require_once 'controllers/UserProfile.php';
+require_once 'controllers/User.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
     $authObj = new Auth(); // Instantiate the User object
-    $userProfileObj = new UserProfile(); // Instantiate the UserProfile object
+    $userProfileObj = new User(); // Instantiate the User object
 
 
 function route($uri, $authObj) {
@@ -47,13 +47,21 @@ function route($uri, $authObj) {
                 login();
                     exit;
             }
-            $userProfile = new UserProfile();
+            $userProfile = new User();
             $userId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
             profile($userId, $userProfile);
             break;
 
         case '/about':
             about();
+            break;
+
+        case '/for_you':
+            for_you();
+            break;
+
+        case '/followers':
+            followers();
             break;
 
         default:
@@ -83,7 +91,6 @@ function about() {
 
 function profile($userId, $userProfile) {
     if (!$userId) {
-        // Redirect to login or handle the case where there is no user ID
         login();
         exit;
     }
@@ -101,6 +108,14 @@ function profile($userId, $userProfile) {
 
 function register() {
     render('register');
+}
+
+function for_you() {
+    render('for_you');
+}
+
+function followers() {
+    render('followers');
 }
 
 function login() {
@@ -127,7 +142,7 @@ function singlePost($postId){
 }
 
 function fetchPostById($postId) {
-    include 'connection.php'; // Your database connection file
+    include 'connection.php';
 
     $stmt = $mysqli->prepare("SELECT * FROM posts WHERE post_id = ?");
     $stmt->bind_param("i", $postId);

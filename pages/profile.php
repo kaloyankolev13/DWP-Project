@@ -1,15 +1,15 @@
 <?php
-require_once 'controllers/UserProfile.php';
+require_once 'controllers/User.php';
 
 
-$userProfile = new UserProfile();
+$userProfile = new User();
 
 if (isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
 
     $user = $userProfile->getUserDetails($user_id);
     if (!$user) {
-        die("User not found."); // Or redirect to a different page
+        die("User not found.");
     }
 
     $posts = $userProfile->getUserPosts($user_id);
@@ -20,9 +20,10 @@ if (isset($_GET['user_id'])) {
         return array_map('htmlspecialchars', $post);
     }, $posts);
 
+    $followerCount = $userProfile->getFollowerCount($user_id);
+
 } else {
-    // Redirect or show an error message if user_id is not provided in the URL
-    header('Location: default_page.php'); // Redirect to a default page
+    // header('Location: login.php');
     exit;
 }
 ?>
@@ -37,6 +38,7 @@ if (isset($_GET['user_id'])) {
                 <div class="card-body">
                     <h4 class="card-title"><?= $user['username'] ?></h4>
                     <p class="card-text">Member since <?= date("F j, Y", strtotime($user['registration_date'])) ?></p>
+                    <a href="followers" class="card-text">Followers: <?= $followerCount ?></a>
                     <a href="#" class="btn btn-primary">Edit Profile</a>
                 </div>
             </div>

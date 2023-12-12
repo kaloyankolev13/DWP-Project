@@ -1,10 +1,20 @@
 <?php
 require_once 'controllers/Posts.php';
 require_once 'controllers/Comments.php';
+require_once 'controllers/User.php';
+
 
 $postsObj = new Posts();
 $commentsObj = new Comments();
+$userObj = new User();
 
+// Follow action
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['follow'], $_POST['followed_id'])) {
+    $follower_id = $_SESSION['user_id'];
+    $followed_id = $_POST['followed_id'];
+
+    $userObj->followUser($follower_id, $followed_id);
+}
 
 // Comments creation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_comment'], $_POST['comment'], $_POST['post_id'])) {
@@ -54,6 +64,12 @@ $posts = $postsObj->fetchPosts();
                             <a href="/DWP_assignment/profile?user_id=<?= $post['user_id']; ?>">
                                 <?= $post['username']; ?>
                             </a>
+                            <?php if ($_SESSION['user_id'] != $post['user_id']): ?>
+                                <form action="" method="post" class="d-inline">
+                                    <input type="hidden" name="followed_id" value="<?= $post['user_id'] ?>">
+                                    <button type="submit" name="follow" class="btn btn-primary btn-sm">Follow</button>
+                                </form>
+                            <?php endif; ?>
 
                         </h5>
                         <p class="card-text"><small class="text-muted">Last updated <?= date("F j, Y, g:i a", strtotime($post['timestamp'])) ?></small></p>
