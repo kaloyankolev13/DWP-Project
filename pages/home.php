@@ -8,12 +8,19 @@ $postsObj = new Posts();
 $commentsObj = new Comments();
 $userObj = new User();
 
-// Follow action
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['follow'], $_POST['followed_id'])) {
+// Follow/Unfollow action
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['follow_unfollow'], $_POST['followed_id'])) {
     $follower_id = $_SESSION['user_id'];
     $followed_id = $_POST['followed_id'];
 
-    $userObj->followUser($follower_id, $followed_id);
+    // Check if already following
+    if ($userObj->isFollowing($follower_id, $followed_id)) {
+        // If already following, then unfollow
+        $userObj->unfollowUser($follower_id, $followed_id);
+    } else {
+        // If not following, then follow
+        $userObj->followUser($follower_id, $followed_id);
+    }
 }
 
 // Comments creation
@@ -64,10 +71,14 @@ $posts = $postsObj->fetchPosts();
                             <a href="/DWP_assignment/profile?user_id=<?= $post['user_id']; ?>">
                                 <?= $post['username']; ?>
                             </a>
-                            <?php if ($_SESSION['user_id'] != $post['user_id']): ?>
+                            <?php if ($_SESSION['user_id'] != $post['user_id']) : ?>
                                 <form action="" method="post" class="d-inline">
                                     <input type="hidden" name="followed_id" value="<?= $post['user_id'] ?>">
-                                    <button type="submit" name="follow" class="btn btn-primary btn-sm">Follow</button>
+                                    <?php if ($userObj->isFollowing($_SESSION['user_id'], $post['user_id'])) : ?>
+                                        <button type="submit" name="follow_unfollow" class="btn btn-secondary btn-sm">Unfollow</button>
+                                    <?php else : ?>
+                                        <button type="submit" name="follow_unfollow" class="btn btn-primary btn-sm">Follow</button>
+                                    <?php endif; ?>
                                 </form>
                             <?php endif; ?>
 

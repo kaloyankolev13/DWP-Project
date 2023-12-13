@@ -24,7 +24,7 @@ $menuItems = [
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- Always visible menu items -->
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/">Home</a>
+                    <a class="nav-link" aria-current="page" href="/DWP_assignment/">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="about">About</a>

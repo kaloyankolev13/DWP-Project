@@ -1,12 +1,14 @@
 <?php
 require_once 'controllers/Auth.php'; 
 require_once 'controllers/User.php';
+require_once 'controllers/Posts.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
     $authObj = new Auth(); // Instantiate the User object
     $userProfileObj = new User(); // Instantiate the User object
+    $postsObj = new Posts(); // Instantiate the Posts object
 
 
 function route($uri, $authObj) {
@@ -131,27 +133,13 @@ function notFound() {
     render('404');
 }
 
-function singlePost($postId){
-    // Fetch the post based on the $postId
-    $post = fetchPostById($postId);
+function singlePost($postId) {
+    $postsObj = new Posts();  // Make sure to use the global keyword to access the global $postsObj
+    $post = $postsObj->fetchPostById($postId);
     if ($post) {
         render('single_post', ['post' => $post]);
     } else {
         notFound();
-    }
-}
-
-function fetchPostById($postId) {
-    include 'connection.php';
-
-    $stmt = $mysqli->prepare("SELECT * FROM posts WHERE post_id = ?");
-    $stmt->bind_param("i", $postId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        return $result->fetch_assoc();
-    } else {
-        return null;
     }
 }
 
@@ -163,19 +151,19 @@ function editPost($postId) {
     }
 
     // Fetch the post based on the postId
-    $post = fetchPostById($postId);
-    if ($post) {
-        // Check if the logged-in user has permission to edit the post
-        if ($_SESSION['user_id'] == $post['user_id']) {
-            render('edit_post', ['post' => $post]); // Render the edit page with the post data
-        } else {
-            // If the user does not have permission, redirect or show an error
-            echo "You do not have permission to edit this post.";
-            exit;
-        }
-    } else {
-        notFound();
-    }
+    // $post = fetchPostById($postId);
+    // if ($post) {
+    //     // Check if the logged-in user has permission to edit the post
+    //     if ($_SESSION['user_id'] == $post['user_id']) {
+    //         render('edit_post', ['post' => $post]); // Render the edit page with the post data
+    //     } else {
+    //         // If the user does not have permission, redirect or show an error
+    //         echo "You do not have permission to edit this post.";
+    //         exit;
+    //     }
+    // } else {
+    //     notFound();
+    // }
 }
 
 

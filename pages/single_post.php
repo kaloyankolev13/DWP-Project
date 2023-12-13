@@ -1,22 +1,4 @@
 <?php
-
-include 'controllers/posts.php';
-include 'connection.php';
-
-$postsObj = new Posts($mysqli);
-
-if (isset($_GET['post_id'])) {
-    $post_id = $_GET['post_id'];
-    $post = $postsObj->fetchPostById($post_id);
-
-    if (!$post) {
-        header("HTTP/1.0 404 Not Found");
-        echo "Post not found.";
-        exit;
-    }} else {
-        header("Location: index.php");
-        exit;
-    }
 ?>
 
 <div class="container mt-4">
