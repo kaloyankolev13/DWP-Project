@@ -149,21 +149,8 @@ function editPost($postId) {
         header('Location: login.php');
         exit;
     }
+    render('edit_post');
 
-    // Fetch the post based on the postId
-    // $post = fetchPostById($postId);
-    // if ($post) {
-    //     // Check if the logged-in user has permission to edit the post
-    //     if ($_SESSION['user_id'] == $post['user_id']) {
-    //         render('edit_post', ['post' => $post]); // Render the edit page with the post data
-    //     } else {
-    //         // If the user does not have permission, redirect or show an error
-    //         echo "You do not have permission to edit this post.";
-    //         exit;
-    //     }
-    // } else {
-    //     notFound();
-    // }
 }
 
 

@@ -42,6 +42,23 @@ class Posts {
     }
     }
 
+    public function editPost($postId, $userId, $newCaption) {
+        $postId = filter_var($postId, FILTER_SANITIZE_NUMBER_INT);
+        $userId = filter_var($userId, FILTER_SANITIZE_NUMBER_INT);
+        $newCaption = filter_var($newCaption, FILTER_UNSAFE_RAW);
+    
+        $this->dbController->beginTransaction();
+        try {
+            $this->dbController->query("UPDATE posts SET caption = ? WHERE post_id = ? AND user_id = ?", [$newCaption, $postId, $userId]);
+    
+            $this->dbController->commit();
+            return "Post updated successfully.";
+        } catch (Exception $e) {
+            $this->dbController->rollback();
+            throw $e;
+        }
+    }
+
     public function fetchPosts() {
         $posts = DBController::query("SELECT p.post_id, p.caption, p.timestamp, p.user_id, u.username, ph.photo_path, 
                                       COUNT(l.like_id) as like_count
@@ -58,7 +75,7 @@ class Posts {
     public function fetchPostById($post_id) {
         $post_id = filter_var($post_id, FILTER_SANITIZE_NUMBER_INT);
 
-        $post = DBController::query("SELECT p.post_id, p.caption, p.timestamp, u.username, ph.photo_path, COUNT(l.like_id) as like_count
+        $post = DBController::query("SELECT p.post_id, p.caption, p.timestamp, u.username,p.user_id ,ph.photo_path, COUNT(l.like_id) as like_count
                                      FROM posts p
                                      LEFT JOIN users u ON p.user_id = u.user_id
                                      LEFT JOIN photos ph ON p.post_id = ph.post_id

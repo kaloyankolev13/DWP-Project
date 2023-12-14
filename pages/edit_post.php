@@ -1,5 +1,6 @@
 <?php
-include 'connection.php';
+require_once 'controllers/Posts.php';
+
 
 if (!isset($_SESSION['user_id'], $_GET['post_id'])) {
     header('Location: login.php');
@@ -9,24 +10,34 @@ if (!isset($_SESSION['user_id'], $_GET['post_id'])) {
 $user_id = $_SESSION['user_id'];
 $post_id = $_GET['post_id'];
 
-$stmt = $mysqli->prepare("SELECT * FROM posts WHERE post_id = ? AND user_id = ?");
-$stmt->bind_param("ii", $post_id, $user_id);
-$stmt->execute();
-$post = $stmt->get_result()->fetch_assoc();
+var_dump($user_id);
 
-$stmt->close();
+$posts = new Posts();
 
-if (!$post) {
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['caption'], $_POST['post_id'])) {
+    $caption = $_POST['caption'];
+
+    try {
+        $posts->editPost($post_id, $user_id, $caption);
+        echo "Post updated successfully!";
+        // Optionally, redirect or reload the page to show updated data
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+$post = $posts->fetchPostById($post_id);
+
+if (!$post || $post['user_id'] != $user_id) {
     echo "Post not found or you don't have permission to edit it.";
     exit;
 }
 ?>
 
-
-
 <div class="container">
     <h1>Edit Post</h1>
-    <form action="process_edit_post.php" method="post">
+    <form action="" method="post">
         <input type="hidden" name="post_id" value="<?= htmlspecialchars($post_id); ?>">
         <div class="mb-3">
             <label for="caption" class="form-label">Caption</label>
