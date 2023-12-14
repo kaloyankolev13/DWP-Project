@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS posts (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
+    heading TEXT NOT NULL,
     caption TEXT,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -50,12 +51,10 @@ CREATE TABLE IF NOT EXISTS followers (
 );
 CREATE TABLE IF NOT EXISTS super_admins (
     super_admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT UNIQUE,  -- Assuming a super admin is also a user
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,  -- Password should be securely hashed
-    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS banned_users (
     ban_id INT AUTO_INCREMENT PRIMARY KEY,

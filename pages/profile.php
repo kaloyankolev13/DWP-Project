@@ -1,8 +1,9 @@
 <?php
 require_once 'controllers/User.php';
-
+require_once 'controllers/Posts.php';
 
 $userProfile = new User();
+$postsObj = new Posts();
 
 if (isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
@@ -21,6 +22,20 @@ if (isset($_GET['user_id'])) {
     }, $posts);
 
     $followerCount = $userProfile->getFollowerCount($user_id);
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_post'])) {
+        $post_id = $_POST['post_id'];
+        if ($_SESSION['user_id'] == $user_id) {
+            try {
+                $deleteResult = $postsObj->deletePost($post_id, $user_id);
+                // Redirect to refresh the page
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?user_id=' . $user_id);
+                exit;
+            } catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
+        }
+    }
 
 } else {
     // header('Location: login.php');
@@ -78,6 +93,14 @@ if (isset($_GET['user_id'])) {
                         </div>
                     </div>
                 </a>
+
+                <!-- Delete Button -->
+                <?php if ($_SESSION['user_id'] == $user_id) : ?>
+                    <form action="" method="post" class="d-inline">
+                        <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
+                        <button type="submit" name="delete_post" class="btn btn-danger">Delete</button>
+                    </form>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
     </div>

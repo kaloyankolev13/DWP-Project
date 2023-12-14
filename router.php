@@ -34,7 +34,7 @@ function route($uri, $authObj) {
         case '/edit_post':
             $postId = isset($_GET['post_id']) ? $_GET['post_id'] : null;
             if ($postId) {
-                editPost($postId);
+                editPost();
             } else {
                 notFound();
             }
@@ -143,7 +143,7 @@ function singlePost($postId) {
     }
 }
 
-function editPost($postId) {
+function editPost() {
     // Assuming the user must be logged in to edit a post
     if (!isset($_SESSION['user_id'])) {
         header('Location: login.php');

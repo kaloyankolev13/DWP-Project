@@ -13,12 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['follow_unfollow'], $_P
     $follower_id = $_SESSION['user_id'];
     $followed_id = $_POST['followed_id'];
 
-    // Check if already following
     if ($userObj->isFollowing($follower_id, $followed_id)) {
-        // If already following, then unfollow
         $userObj->unfollowUser($follower_id, $followed_id);
     } else {
-        // If not following, then follow
         $userObj->followUser($follower_id, $followed_id);
     }
 }
@@ -35,10 +32,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_comment'], $_PO
 // Post creation
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['create_post'])) {
     $userId = $_SESSION['user_id'];
+    $heading = $_POST['heading'];
     $caption = $_POST['caption'];
     $photo = $_FILES['photo'];
 
-    $createResult = $postsObj->createPost($userId, $caption, $photo);
+    $createResult = $postsObj->createPost($userId, $heading, $caption, $photo);
+}
+
+// Delete post
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_post'], $_POST['post_id'])) {
+    $post_id = $_POST['post_id'];
+    $user_id = $_SESSION['user_id'];
+
+    try {
+        $deleteResult = $postsObj->deletePost($post_id, $user_id);
+        echo "Post deleted successfully!";
+        // Optionally, redirect to refresh the page
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+    }
 }
 
 // Like action
@@ -53,7 +65,8 @@ $posts = $postsObj->fetchPosts();
 <div class="container">
     <div class="row">
         <form action="" method="post" enctype="multipart/form-data">
-            <input type="text" name="caption" placeholder="Enter caption" required>
+            <input type="text" name="heading" placeholder="Enter heading" required>
+            <textarea type="text" name="caption" placeholder="Enter caption" required></textarea>
             <input type="file" name="photo" required>
             <button type="submit" name="create_post">Create Post</button>
         </form>
@@ -66,11 +79,18 @@ $posts = $postsObj->fetchPosts();
 
                     <div class="card-body">
                         <h5 class="card-title">
+                            <h1><?= $post['heading']; ?></h1>
                             <a href="/DWP_assignment/post-detail?post_id=<?= $post['post_id']; ?>"><?= $post['caption'] ?></a>
                             <br>
-                            <a href="/DWP_assignment/profile?user_id=<?= $post['user_id']; ?>">
+                            <a href="profile?user_id=<?= $post['user_id']; ?>">
                                 <?= $post['username']; ?>
                             </a>
+                            <?php if ($_SESSION['user_id'] == $post['user_id']) : ?>
+                                <form action="" method="post" class="d-inline">
+                                    <input type="hidden" name="post_id" value="<?= $post['post_id'] ?>">
+                                    <button type="submit" name="delete_post" class="btn btn-danger">Delete</button>
+                                </form>
+                            <?php endif; ?>
                             <?php if ($_SESSION['user_id'] != $post['user_id']) : ?>
                                 <form action="" method="post" class="d-inline">
                                     <input type="hidden" name="followed_id" value="<?= $post['user_id'] ?>">
