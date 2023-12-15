@@ -35,7 +35,7 @@ if (!$post || $post['user_id'] != $user_id) {
 
 <div class="container">
     <h1>Edit Post</h1>
-    <img src="<?= htmlspecialchars($post['photo_path']); ?>" class="card-img-top" alt="Post image">
+    <img src="<?="https://ethhos.store/".$post['photo_path']; ?>" class="card-img-top" alt="Post image">
     <form action="" method="post">
         <input type="hidden" name="post_id" value="<?= htmlspecialchars($post_id); ?>">
         <div class="mb-3">

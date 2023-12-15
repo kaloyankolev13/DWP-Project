@@ -66,6 +66,10 @@ function route($uri, $authObj) {
             followers();
             break;
 
+        case '/admin':
+            admin();
+            break;
+
         default:
             notFound();
             break;
@@ -89,6 +93,10 @@ function create_post() {
 function about() {
     $welcomeMessage = "Welcome to our website!";
     render('about', ['message' => $welcomeMessage]);
+}
+
+function admin() {
+    render('admin');
 }
 
 function profile($userId, $userProfile) {

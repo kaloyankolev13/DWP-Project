@@ -1,4 +1,3 @@
-
 <?php
 require_once 'DBController.php';
 class Posts
@@ -104,19 +103,24 @@ class Posts
             throw $e;
         }
     }
-    public function deletePost($postId, $userId)
-    {
+    public function deletePost($postId, $userId) {
         $postId = filter_var($postId, FILTER_SANITIZE_NUMBER_INT);
         $userId = filter_var($userId, FILTER_SANITIZE_NUMBER_INT);
-
+    
+        $userObj = new User();
+        $isAdmin = $userObj->isAdmin($userId); // Assuming isAdmin method exists in User class
+    
         $this->dbController->beginTransaction();
         try {
-            // Optional: Check if the post belongs to the user
-            $post = $this->dbController->query("SELECT * FROM posts WHERE post_id = ? AND user_id = ?", [$postId, $userId]);
-            if (!$post) {
-                throw new Exception("Post not found or you do not have permission to delete it.");
+            // If the user is not an admin, verify ownership
+            if (!$isAdmin) {
+                $post = $this->dbController->query("SELECT * FROM posts WHERE post_id = ? AND user_id = ?", [$postId, $userId]);
+                if (!$post) {
+                    throw new Exception("Post not found or you do not have permission to delete it.");
+                }
             }
-
+    
+            // Delete post related data and the post itself
             $this->dbController->query("DELETE FROM likes WHERE post_id = ?", [$postId]);
             $this->dbController->query("DELETE FROM comments WHERE post_id = ?", [$postId]);
             $this->dbController->query("DELETE FROM photos WHERE post_id = ?", [$postId]);
@@ -128,6 +132,7 @@ class Posts
             throw $e;
         }
     }
+    
 }
 
 ?>

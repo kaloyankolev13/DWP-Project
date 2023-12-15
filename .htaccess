@@ -1,6 +1,17 @@
 RewriteEngine On
-RewriteBase /DWP_assignment/
-RewriteRule ^index\\.php$ - [L]
+
+# Base directory of the rewrite rules
+
+# Exclude the uploads directory from being rewritten
+RewriteCond %{REQUEST_URI} !^/uploads/
+
+# Direct requests to index.php and pass the rest of the URL as a parameter
+# This rule is applied only if the requested resource is not a file or a directory
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /DWP_assignment/index.php [L]
+RewriteRule ^([^/]+)/? index.php?url=$1 [L,QSA]
+
+# Redirect all other requests to index.php in the DWP_assignment directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]

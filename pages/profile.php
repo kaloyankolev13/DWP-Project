@@ -54,7 +54,6 @@ if (isset($_GET['user_id'])) {
                     <h4 class="card-title"><?= $user['username'] ?></h4>
                     <p class="card-text">Member since <?= date("F j, Y", strtotime($user['registration_date'])) ?></p>
                     <a href="followers" class="card-text">Followers: <?= $followerCount ?></a>
-                    <a href="#" class="btn btn-primary">Edit Profile</a>
                 </div>
             </div>
         </div>
@@ -86,7 +85,7 @@ if (isset($_GET['user_id'])) {
             <div class="col-md-6 col-lg-4 mb-3">
                 <a href="/DWP_assignment/edit_post?post_id=<?= $post['post_id'] ?>" class="card-link">
                     <div class="card">
-                        <img src="<?= $post['photo_path'] ?: 'https://via.placeholder.com/150' ?>" class="card-img-top" alt="Post Image">
+                        <img src="<?="https://ethhos.store/".$post['photo_path']?: 'https://via.placeholder.com/150' ?>" class="card-img-top" alt="Post Image">
                         <div class="card-body">
                             <h5 class="card-title"><?= $post['caption'] ?></h5>
                             <p class="card-text"><small class="text-muted">Posted on <?= date("F j, Y, g:i a", strtotime($post['timestamp'])) ?></small></p>

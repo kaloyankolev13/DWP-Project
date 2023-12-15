@@ -1,9 +1,14 @@
 <?php
-require_once 'controllers/Auth.php'; // Adjust the path as necessary
+require_once 'controllers/Auth.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+if (isset($_GET['action']) && $_GET['action'] == 'logout') {
+    $auth = new Auth();
+    $auth->logout();
+    exit();
+}
 $menuItems = [
     ['url' => '/', 'label' => 'Home'],
     ['url' => '/register', 'label' => 'Register'],
@@ -24,30 +29,28 @@ $menuItems = [
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <!-- Always visible menu items -->
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/DWP_assignment/">Home</a>
+                    <a class="nav-link" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="about">About</a>
                 </li>
                 <!-- Conditional menu items -->
-                <?php if (!isset($_SESSION['user_id'])): ?>
+                <?php if (!isset($_SESSION['user_id'])) : ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="register"; >">Register</a>
+                        <a class="nav-link" href="/DWP_assignment/register" ;>Register</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="login">Login</a>
+                        <a class="nav-link" href="/DWP_assignment/login">Login</a>
                     </li>
-                <?php else: ?>
+                <?php else : ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="profile?user_id=<?php echo $_SESSION['user_id']; ?>">Profile</a>
+                        <a class="nav-link" href="/DWP_assignment/profile?user_id=<?php echo $_SESSION['user_id']; ?>">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="logout">Logout</a>
+                        <a class="nav-link" href="?action=logout">Logout</a>
                     </li>
                 <?php endif; ?>
             </ul>
         </div>
     </div>
 </nav>
-
-

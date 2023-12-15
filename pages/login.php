@@ -3,9 +3,7 @@ require_once 'controllers/Auth.php';
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-$username = $_SESSION['user_id'];
-$email = $_SESSION['email'];
-var_dump($username);
+
 
 
 $errorMessage = '';

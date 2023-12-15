@@ -5,6 +5,12 @@ class User
 {
     private $dbController;
 
+    public function isAdmin($userId) {
+        // Example query, adjust according to your database structure
+        $result = $this->dbController->query("SELECT * FROM super_admins WHERE user_id = ?", [$userId]);
+        return !empty($result);
+    }
+
     public function __construct()
     {
         $this->dbController = new DBController();
@@ -79,5 +85,10 @@ class User
                   WHERE f.followed_id = ?
                   ORDER BY u.username ASC";
         return $this->dbController->query($query, [$user_id]);
+    }
+
+    public function isUserBanned($userId) {
+        $result = $this->dbController->query("SELECT * FROM banned_users WHERE user_id = ?", [$userId]);
+        return !empty($result); // returns true if user is banned
     }
 }
